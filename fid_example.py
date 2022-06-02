@@ -2,16 +2,16 @@
 from __future__ import absolute_import, division, print_function
 import os
 import glob
-#os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import numpy as np
 import fid
 from scipy.misc import imread
 import tensorflow as tf
 
 # Paths
-image_path = '/tmp/images' # set path to some generated images
-stats_path = 'fid_stats.npz' # training set statistics
-inception_path = fid.check_or_download_inception(None) # download inception network
+image_path = '/tmp/images'  # set path to some generated images
+stats_path = 'fid_stats.npz'  # training set statistics
+inception_path = fid.check_or_download_inception(None)  # download inception network
 
 # loads all images into memory (this might require a lot of RAM!)
 image_list = glob.glob(os.path.join(image_path, '*.jpg'))
