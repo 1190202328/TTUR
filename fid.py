@@ -327,7 +327,7 @@ def _handle_path(path, sess, low_profile=False):
                 if len(img.shape) != 3 or img.shape[2] != 3:
                     print('skip one channel image')
                     continue
-                temp.append(imresize(img, (128, 128)).astype(np.float32))
+                temp.append(imresize(img, (256, 256)).astype(np.float32))
             x = np.array(temp)
             m, s = calculate_activation_statistics(x, sess, verbose=True)
             del x  # clean up memory
