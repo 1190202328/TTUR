@@ -315,6 +315,19 @@ def _handle_path(path, sess, low_profile=False):
             for sub_dir in os.listdir(path):
                 sub_path = pathlib.Path(f'{path}/{sub_dir}')
                 files += list(sub_path.glob('*.jpg')) + list(sub_path.glob('*.png'))
+            test_files = []
+            train_set_path = f'{path}/../../train/filenames.pickle'
+            with open(train_set_path, 'rb') as f:
+                train_set = pickle.load(f)
+            print('Load filenames from: %s (%d)' % (train_set_path, len(train_set)))
+            train_set = set(train_set)
+            for file in files:
+                file_name, file_extension = os.path.splitext(file)
+                temp = file_name.split('/')
+                file_name = '/'.join(temp[len(temp) - 2:])
+                if file_name not in train_set:
+                    test_files.append(file)
+            files = test_files
         else:
             files = list(path.glob('*.jpg')) + list(path.glob('*.png'))
         # changed
@@ -327,7 +340,7 @@ def _handle_path(path, sess, low_profile=False):
                 if len(img.shape) != 3 or img.shape[2] != 3:
                     print('skip one channel image')
                     continue
-                temp.append(imresize(img, (256, 256)).astype(np.float32))
+                temp.append(imresize(img, (128, 128)).astype(np.float32))
             x = np.array(temp)
             m, s = calculate_activation_statistics(x, sess, verbose=True)
             del x  # clean up memory
@@ -372,6 +385,21 @@ if __name__ == "__main__":
     # for sub_dir in os.listdir(path):
     #     sub_path = pathlib.Path(f'{path}/{sub_dir}')
     #     files += list(sub_path.glob('*.jpg')) + list(sub_path.glob('*.png'))
+    # print(len(files))
+    # print(path)
+    # test_files = []
+    # train_set_path = f'{path}/../../train/filenames.pickle'
+    # with open(train_set_path, 'rb') as f:
+    #     train_set = pickle.load(f)
+    # print('Load filenames from: %s (%d)' % (train_set_path, len(train_set)))
+    # train_set = set(train_set)
+    # for file in files:
+    #     file_name, file_extension = os.path.splitext(file)
+    #     temp = file_name.split('/')
+    #     file_name = '/'.join(temp[len(temp) - 2:])
+    #     if file_name not in train_set:
+    #         test_files.append(file)
+    # raise Exception
     # temp = []
     # for fn in files[:5]:
     #     img = imread(str(fn))
@@ -382,12 +410,14 @@ if __name__ == "__main__":
     # x = np.array(temp)
     # print(x)
     # #
-    # # path = pathlib.Path(args.path[0])
-    # # files = list(path.glob('*.jpg')) + list(path.glob('*.png'))
-    # # x = np.array(
-    # #     [resize(imread(str(fn)), (128, 128)).astype(np.float32) for fn in files[:5]])
-    # # print(x)
-    # #
+    # path = pathlib.Path(args.path[0])
+    # files = list(path.glob('*.jpg')) + list(path.glob('*.png'))
+    # raise Exception
+    #
+    # x = np.array(
+    #     [imresize(imread(str(fn)), (128, 128)).astype(np.float32) for fn in files[:5]])
+    # print(x)
+    #
     # inception_path = check_or_download_inception(args.inception)
     # create_inception_graph(str(inception_path))
     # with tf.Session() as sess:
