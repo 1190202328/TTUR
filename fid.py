@@ -315,19 +315,20 @@ def _handle_path(path, sess, low_profile=False):
             for sub_dir in os.listdir(path):
                 sub_path = pathlib.Path(f'{path}/{sub_dir}')
                 files += list(sub_path.glob('*.jpg')) + list(sub_path.glob('*.png'))
-            test_files = []
             train_set_path = f'{path}/../../train/filenames.pickle'
-            with open(train_set_path, 'rb') as f:
-                train_set = pickle.load(f)
-            print('Load filenames from: %s (%d)' % (train_set_path, len(train_set)))
-            train_set = set(train_set)
-            for file in files:
-                file_name, file_extension = os.path.splitext(file)
-                temp = file_name.split('/')
-                file_name = '/'.join(temp[len(temp) - 2:])
-                if file_name not in train_set:
-                    test_files.append(file)
-            files = test_files
+            if os.path.exists(train_set_path):
+                test_files = []
+                with open(train_set_path, 'rb') as f:
+                    train_set = pickle.load(f)
+                print('Load filenames from: %s (%d)' % (train_set_path, len(train_set)))
+                train_set = set(train_set)
+                for file in files:
+                    file_name, file_extension = os.path.splitext(file)
+                    temp = file_name.split('/')
+                    file_name = '/'.join(temp[len(temp) - 2:])
+                    if file_name not in train_set:
+                        test_files.append(file)
+                files = test_files
         else:
             files = list(path.glob('*.jpg')) + list(path.glob('*.png'))
         # changed
